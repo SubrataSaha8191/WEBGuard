@@ -1,0 +1,15 @@
+# Python
+backend/venv/
+**/__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Datasets
+datasets/
+backend/data/
+
+# OS / Editor
+.DS_Store
+.vscode/
