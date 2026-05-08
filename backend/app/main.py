@@ -3,7 +3,7 @@ from app.routes.scan import router as scan_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
-    title="PhishGuard API",
+    title="WEBGuard API",
     description="AI-Powered phishing detection platform",
     version="1.0.0",
 )
@@ -20,4 +20,4 @@ app.include_router(scan_router)
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to the PhishGuard API!"}
+    return {"message": "Welcome to the WEBGuard API!"}

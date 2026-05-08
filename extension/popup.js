@@ -61,16 +61,16 @@ themeToggleBtn.addEventListener("click", () => {
 const tabs = document.querySelectorAll(".tab");
 const views = document.querySelectorAll(".view");
 
-tabs.forEach(tab => {
+tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     // Remove active from all tabs
-    tabs.forEach(t => t.classList.remove("active"));
+    tabs.forEach((t) => t.classList.remove("active"));
     // Hide all views
-    views.forEach(v => {
+    views.forEach((v) => {
       v.classList.remove("active-view");
       v.classList.add("hidden-view");
     });
-    
+
     // Add active to clicked tab
     tab.classList.add("active");
     // Show target view
@@ -83,12 +83,12 @@ tabs.forEach(tab => {
 
 async function main() {
   initializeTheme();
-  
+
   const tab = await getCurrentTab();
   const url = tab.url;
-  
+
   if (!url) return;
-  
+
   document.getElementById("url").innerText = url;
   document.getElementById("detail-url").innerText = url;
 
@@ -107,18 +107,24 @@ async function main() {
       <div class="status-title">TRUSTED PAGE</div>
       <div class="status-text">Internal browser page.</div>
     `;
-    document.getElementById("detail-prediction").innerText = "TRUSTED (Internal)";
+    document.getElementById("detail-prediction").innerText =
+      "TRUSTED (Internal)";
     document.getElementById("detail-confidence").innerText = "100%";
     return;
   }
 
   const result = await scanURL(url);
   const card = document.getElementById("status-card");
-  
+
   // Populate Detail View info regardless
-  document.getElementById("detail-prediction").innerText = result.prediction || "ERROR";
-  document.getElementById("detail-confidence").innerText = result.confidence ? `${result.confidence.toFixed(2)}%` : "N/A";
-  document.getElementById("detail-features").innerText = result.features ? JSON.stringify(result.features) : "None extracted";
+  document.getElementById("detail-prediction").innerText =
+    result.prediction || "ERROR";
+  document.getElementById("detail-confidence").innerText = result.confidence
+    ? `${result.confidence.toFixed(2)}%`
+    : "N/A";
+  document.getElementById("detail-features").innerText = result.features
+    ? JSON.stringify(result.features)
+    : "None extracted";
 
   if (result.prediction === "error") {
     card.className = "retro-card border-thick warning";

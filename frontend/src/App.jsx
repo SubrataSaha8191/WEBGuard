@@ -41,7 +41,7 @@ export default function App() {
            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="square" strokeLinejoin="miter">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
-          <h1 className="text-2xl md:text-3xl m-0 leading-none">PHISHGUARD DASHBOARD</h1>
+          <h1 className="text-2xl md:text-3xl m-0 leading-none">WEBGuard DASHBOARD</h1>
         </div>
         
         <button 
