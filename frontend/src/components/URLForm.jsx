@@ -5,35 +5,26 @@ export default function URLForm({ onScan, loading }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!url.trim()) return;
-
     onScan(url);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 w-full"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       <input
         type="text"
-        placeholder="Enter URL to scan..."
+        placeholder="https://example.com"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
-        className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700 focus:outline-none"
+        className="retro-input p-3 w-full font-bold focus:ring-0"
       />
 
       <button
         type="submit"
         disabled={loading}
-        className={`p-4 rounded-xl font-semibold transition-all duration-300 ${
-          loading
-            ? "bg-cyan-700 animate-pulse"
-            : "bg-cyan-500 hover:bg-cyan-600 hover:scale-[1.01] cursor-pointer"
-        }`}
+        className="retro-button p-3 w-full"
       >
-        {loading ? "Scanning..." : "Scan URL"}
+        {loading ? "SCANNING..." : "ANALYZE URL"}
       </button>
     </form>
   );

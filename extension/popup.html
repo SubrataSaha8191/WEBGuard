@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>PhishGuard</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      <span>PHISHGUARD</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="theme-toggle" title="Toggle Theme">
+        <!-- Sun icon by default, will toggle in JS -->
+        <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-target="analysis-view">ANALYSIS</button>
+    <button class="tab" data-target="details-view">DETAILS</button>
+  </nav>
+
+  <main class="content">
+    <!-- Analysis View -->
+    <div id="analysis-view" class="view active-view">
+      <div id="status-card" class="retro-card border-thick loading">
+        <div class="spinner"></div>
+        <div class="status-title">SCANNING...</div>
+      </div>
+      
+      <div class="url-container retro-card border-thick">
+        <p id="url" class="truncate"></p>
+      </div>
+
+      <div class="info-section retro-card border-thick">
+        <div class="info-header">
+          <h3>HOW IT WORKS</h3>
+        </div>
+        <p class="info-text">PhishGuard uses advanced ML models to detect malicious URLs and protect you from phishing attacks in real-time.</p>
+      </div>
+    </div>
+
+    <!-- Details View -->
+    <div id="details-view" class="view hidden-view">
+      <div class="details-section retro-card border-thick">
+        <h3 class="details-title">SCAN DETAILS</h3>
+        <div class="details-row">
+          <span class="details-label">URL:</span>
+          <span class="details-value" id="detail-url">N/A</span>
+        </div>
+        <div class="details-row">
+          <span class="details-label">Prediction:</span>
+          <span class="details-value" id="detail-prediction">N/A</span>
+        </div>
+        <div class="details-row">
+          <span class="details-label">Confidence:</span>
+          <span class="details-value" id="detail-confidence">N/A</span>
+        </div>
+        <div class="details-row">
+          <span class="details-label">Feature Vector:</span>
+          <span class="details-value" id="detail-features">N/A</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
