@@ -125,7 +125,7 @@ function showToast(data) {
         opacity: 0.95;
       ">
         Confidence:
-        ${data.confidence}%
+        ${100 - data.threat_score}%
       </div>
 
     </div>
