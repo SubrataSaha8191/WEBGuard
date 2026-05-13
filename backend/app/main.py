@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routes.scan import router as scan_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes.visual_scan import router as visual_router
 
 app = FastAPI(
     title="WEBGuard API",
@@ -17,7 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(scan_router)
-
+app.include_router(visual_router)
 @app.get("/")
 def home():
     return {"message": "Welcome to the WEBGuard API!"}

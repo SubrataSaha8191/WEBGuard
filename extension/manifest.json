@@ -13,7 +13,8 @@
     "tabs",
     "activeTab",
     "scripting",
-    "notifications"
+    "notifications",
+    "storage"
   ],
 
   "host_permissions": [
@@ -28,7 +29,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.js", "vision.js"]
     }
   ] 
 }

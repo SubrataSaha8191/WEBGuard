@@ -1,50 +1,31 @@
-console.log(
-  "PhishGuard content script loaded"
-);
+console.log("PhishGuard content script loaded");
 
-// ===============================
 // REMOVE EXISTING OVERLAY
-// ===============================
 
 function removeExistingWarning() {
-
-  const existing =
-    document.getElementById(
-      "phishguard-warning-overlay"
-    );
+  const existing =document.getElementById("phishguard-warning-overlay");
 
   if (existing) {
     existing.remove();
   }
 }
 
-// ===============================
 // REMOVE EXISTING TOAST
-// ===============================
 
 function removeExistingToast() {
-
-  const existingToast =
-    document.getElementById(
-      "phishguard-toast"
-    );
+  const existingToast = document.getElementById("phishguard-toast");
 
   if (existingToast) {
     existingToast.remove();
   }
 }
 
-// ===============================
 // TOAST NOTIFICATION
-// ===============================
 
 function showToast(data) {
-
   removeExistingToast();
 
-  const toast =
-    document.createElement("div");
-
+  const toast = document.createElement("div");
   toast.id = "phishguard-toast";
 
   let bgColor = "#16a34a";
@@ -52,10 +33,7 @@ function showToast(data) {
   let icon = "✓";
 
   // SUSPICIOUS
-  if (
-    data.prediction ===
-    "suspicious"
-  ) {
+  if (data.prediction === "suspicious") {
 
     bgColor = "#eab308";
     title = "SUSPICIOUS";
@@ -63,11 +41,7 @@ function showToast(data) {
   }
 
   // MALICIOUS
-  else if (
-    data.prediction ===
-    "malicious"
-  ) {
-
+  else if (data.prediction === "malicious") {
     bgColor = "#dc2626";
     title = "MALICIOUS";
     icon = "✕";
@@ -119,41 +93,22 @@ function showToast(data) {
       ">
         ${title}
       </div>
-
-      <div style="
-        font-size: 14px;
-        opacity: 0.95;
-      ">
-        Confidence:
-        ${100 - data.threat_score}%
-      </div>
-
     </div>
   `;
 
   document.body.appendChild(toast);
-
   setTimeout(() => {
-
     toast.remove();
-
   }, 5000);
 }
 
-// ===============================
 // FULLSCREEN MALICIOUS OVERLAY
-// ===============================
 
 function createWarningOverlay(data) {
-
   removeExistingWarning();
+  const overlay = document.createElement("div");
 
-  const overlay =
-    document.createElement("div");
-
-  overlay.id =
-    "phishguard-warning-overlay";
-
+  overlay.id ="phishguard-warning-overlay";
   overlay.innerHTML = `
     <div class="pg-warning-box">
 
@@ -176,11 +131,6 @@ function createWarningOverlay(data) {
           ${data.prediction}
         </p>
 
-        <p>
-          <strong>Confidence:</strong>
-          ${data.confidence}%
-        </p>
-
       </div>
 
       <div class="pg-buttons">
@@ -194,12 +144,10 @@ function createWarningOverlay(data) {
         </button>
 
       </div>
-
     </div>
   `;
 
-  const style =
-    document.createElement("style");
+  const style = document.createElement("style");
 
   style.textContent = `
     #phishguard-warning-overlay {
@@ -283,21 +231,11 @@ function createWarningOverlay(data) {
   `;
 
   document.head.appendChild(style);
-
-  document.body.appendChild(
-    overlay
-  );
+  document.body.appendChild(overlay);
 
   // LEAVE SITE
 
-  document
-    .getElementById(
-      "pg-leave-btn"
-    )
-    .addEventListener(
-      "click",
-      () => {
-
+  document.getElementById("pg-leave-btn").addEventListener("click",() => {
         window.location.href =
           "https://google.com";
       }
@@ -305,60 +243,35 @@ function createWarningOverlay(data) {
 
   // CONTINUE ANYWAY
 
-  document
-    .getElementById(
-      "pg-proceed-btn"
-    )
-    .addEventListener(
-      "click",
-      () => {
-
+  document.getElementById("pg-proceed-btn").addEventListener("click",() => {
         overlay.remove();
       }
     );
 }
 
-// ===============================
 // MESSAGE LISTENER
-// ===============================
 
 chrome.runtime.onMessage.addListener(
   (message) => {
-
     console.log(
       "MESSAGE RECEIVED:",
       message
     );
 
     // SAFE
-    if (
-      message.prediction ===
-      "safe"
-    ) {
-
+    if (message.prediction === "safe") {
       showToast(message);
     }
 
     // SUSPICIOUS
-    else if (
-      message.prediction ===
-      "suspicious"
-    ) {
-
+    else if (message.prediction === "suspicious") {
       showToast(message);
     }
 
     // MALICIOUS
-    else if (
-      message.prediction ===
-      "malicious"
-    ) {
-
+    else if (message.prediction === "malicious") {
       showToast(message);
-
-      createWarningOverlay(
-        message
-      );
+      createWarningOverlay(message);
     }
   }
 );

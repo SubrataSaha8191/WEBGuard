@@ -4,11 +4,9 @@ function showBrowserNotification(
   url
 ) {
 
-  let title =
-    "PhishGuard";
-
+  let title = "WEBGuard";
   let message =
-    `Website scanned successfully`;
+    "Website scanned successfully";
 
   if (
     prediction === "suspicious"
@@ -19,7 +17,6 @@ function showBrowserNotification(
 
     message =
       `${url}\nMay contain phishing threats.`;
-
   }
 
   else if (
@@ -31,7 +28,6 @@ function showBrowserNotification(
 
     message =
       `${url}\nPotential phishing attack detected!`;
-
   }
 
   else {
@@ -41,7 +37,6 @@ function showBrowserNotification(
 
     message =
       `${url}\nNo major threats detected.`;
-
   }
 
   chrome.notifications.create({
@@ -51,20 +46,24 @@ function showBrowserNotification(
     message: message,
     priority: 2
   });
-
 }
 
-async function scanURL(url, tabId) {
+async function scanURL(
+  url,
+  tabId
+) {
 
   try {
 
-    // Ignore browser internal pages
+    // IGNORE INTERNAL PAGES
+
     if (
       url.startsWith("chrome://") ||
       url.startsWith("chrome-extension://") ||
       url.startsWith("edge://") ||
       url.startsWith("about:")
     ) {
+
       chrome.action.setBadgeText({
         text: ""
       });
@@ -72,25 +71,39 @@ async function scanURL(url, tabId) {
       return;
     }
 
+    // URL SCAN API
+
     const response = await fetch(
       "http://127.0.0.1:8000/scan-url",
       {
         method: "POST",
+
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+            "application/json"
         },
+
         body: JSON.stringify({
           url: url
         })
       }
     );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
-    console.log("Scan Result:", data);
+    console.log(
+      "Scan Result:",
+      data
+    );
 
-    const prediction = data.prediction;
-    const confidence = data.confidence;
+    const prediction =
+      data.prediction;
+
+    const confidence =
+      data.confidence;
+
+    // SHOW SYSTEM NOTIFICATION
 
     showBrowserNotification(
       prediction,
@@ -98,11 +111,11 @@ async function scanURL(url, tabId) {
       url
     );
 
-    // =========================
     // BADGE COLORS
-    // =========================
 
-    if (prediction === "safe") {
+    if (
+      prediction === "safe"
+    ) {
 
       chrome.action.setBadgeText({
         text: "OK",
@@ -113,10 +126,11 @@ async function scanURL(url, tabId) {
         color: "#16a34a",
         tabId: tabId
       });
-
     }
 
-    else if (prediction === "suspicious") {
+    else if (
+      prediction === "suspicious"
+    ) {
 
       chrome.action.setBadgeText({
         text: "!",
@@ -127,7 +141,6 @@ async function scanURL(url, tabId) {
         color: "#eab308",
         tabId: tabId
       });
-
     }
 
     else {
@@ -141,18 +154,18 @@ async function scanURL(url, tabId) {
         color: "#dc2626",
         tabId: tabId
       });
-
     }
 
-    // =========================
-    // SEND TO CONTENT SCRIPT
-    // =========================
+    // SEND RESULT TO CONTENT SCRIPT
 
     chrome.tabs.sendMessage(
       tabId,
       {
-        prediction: prediction,
-        confidence: confidence
+        prediction:
+          prediction,
+
+        confidence:
+          confidence
       }
     );
 
@@ -164,16 +177,17 @@ async function scanURL(url, tabId) {
       "Background scan failed:",
       error
     );
-
   }
 }
 
-// =========================
-// AUTO SCAN
-// =========================
+// AUTO URL SCAN
 
 chrome.tabs.onUpdated.addListener(
-  (tabId, changeInfo, tab) => {
+  (
+    tabId,
+    changeInfo,
+    tab
+  ) => {
 
     if (
       changeInfo.status === "complete" &&
@@ -184,8 +198,122 @@ chrome.tabs.onUpdated.addListener(
         tab.url,
         tabId
       );
-
     }
+  }
+);
 
+// TRIGGER SCREENSHOT CAPTURE
+
+chrome.tabs.onActivated.addListener(
+  () => {
+
+    chrome.runtime.sendMessage({
+      action:
+        "capture_screenshot"
+    });
+  }
+);
+
+// SCREENSHOT HANDLER
+
+chrome.runtime.onMessage.addListener(
+  async (
+    message,
+    sender,
+    sendResponse
+  ) => {
+
+    if (
+      message.action ===
+      "capture_screenshot"
+    ) {
+
+      try {
+
+        chrome.tabs.captureVisibleTab(
+          null,
+          {
+            format: "png"
+          },
+
+          async (
+            dataUrl
+          ) => {
+
+            try {
+
+              if (!dataUrl) {
+
+                console.error(
+                  "No screenshot data"
+                );
+
+                return;
+              }
+
+              console.log(
+                "Screenshot captured"
+              );
+
+              console.log(
+                dataUrl.substring(
+                  0,
+                  50
+                )
+              );
+
+              const payload = {
+                image: dataUrl
+              };
+
+              console.log(
+                "Sending screenshot..."
+              );
+
+              const response =
+                await fetch(
+                  "http://127.0.0.1:8000/analyze-visual",
+                  {
+                    method: "POST",
+
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+
+                    body: JSON.stringify(
+                      payload
+                    )
+                  }
+                );
+
+              const result =
+                await response.json();
+
+              console.log(
+                "Visual Result:",
+                result
+              );
+            }
+
+            catch (error) {
+
+              console.error(
+                "Visual scan failed:",
+                error
+              );
+            }
+          }
+        );
+      }
+
+      catch (error) {
+
+        console.error(
+          "Screenshot failed:",
+          error
+        );
+      }
+    }
   }
 );
