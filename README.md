@@ -20,13 +20,13 @@
 - **<img src="https://img.icons8.com/color/48/visible--v1.png" width="24" height="24" align="absmiddle" /> Visual Screenshot Inspection**: Employs Computer Vision to visually assess the webpage for deceptive patterns.
 - **<img src="https://img.icons8.com/color/48/flash-on.png" width="24" height="24" align="absmiddle" /> Browser Extension Integration**: Seamless, lightweight Chrome extension offering automated monitoring and threat notifications.
 - **<img src="https://img.icons8.com/color/48/traffic-light.png" width="24" height="24" align="absmiddle" /> Tri-Level Threat Classification**:
-  - <img src="https://img.icons8.com/color/48/green-circle.png" width="20" height="20" align="absmiddle" /> **SAFE**: Minimal phishing indicators.
-  - <img src="https://img.icons8.com/color/48/yellow-circle.png" width="20" height="20" align="absmiddle" /> **SUSPICIOUS**: Unusual characteristics needing caution.
-  - <img src="https://img.icons8.com/color/48/red-circle.png" width="20" height="20" align="absmiddle" /> **MALICIOUS**: Strong malicious patterns detected.
+  - <img src="https://img.icons8.com/color/48/checked--v1.png" width="20" height="20" align="absmiddle" /> **SAFE**: Minimal phishing indicators.
+  - <img src="https://img.icons8.com/color/48/high-importance.png" width="20" height="20" align="absmiddle" /> **SUSPICIOUS**: Unusual characteristics needing caution.
+  - <img src="https://img.icons8.com/color/48/cancel--v1.png" width="20" height="20" align="absmiddle" /> **MALICIOUS**: Strong malicious patterns detected.
 
 ---
 
-## <img src="https://img.icons8.com/color/48/architecture.png" width="28" height="28" align="absmiddle" /> Architecture & Workflow
+## <img src="https://img.icons8.com/color/48/mind-map.png" width="28" height="28" align="absmiddle" /> Architecture & Workflow
 
 Understanding how **WEBGuard** operates under the hood.
 
@@ -64,6 +64,11 @@ WEBGuard leverages a modern and powerful technology stack across its architectur
   <img src="https://img.shields.io/badge/Google_Chrome-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Chrome Extension"/>
 </p>
 
+### <img src="https://img.icons8.com/color/48/docker.png" width="24" height="24" align="absmiddle" /> DevOps
+<p align="left">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+</p>
+
 ---
 
 ## <img src="https://img.icons8.com/color/48/camera--v1.png" width="28" height="28" align="absmiddle" /> Screenshots
@@ -96,8 +101,22 @@ Here are some visual demonstrations of **WEBGuard** in action:
 - Node.js & npm (for Frontend)
 - Python 3.9+ (for Backend)
 - Google Chrome browser (for Extension)
+- **Docker & Docker Compose** (Optional, for containerized setup)
 
-### 1. Backend Setup
+### 🐳 Using Docker (Recommended)
+
+To quickly spin up the entire application stack:
+```bash
+cd docker
+docker-compose up --build
+```
+This will start both the backend API and the frontend dashboard automatically.
+
+### 💻 Manual Setup
+
+<details>
+<summary><b>1. Backend Setup</b></summary>
+<br>
 
 ```bash
 cd backend
@@ -106,16 +125,20 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+</details>
 
-### 2. Frontend Setup
+<details>
+<summary><b>2. Frontend Setup</b></summary>
+<br>
 
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+</details>
 
-### 3. Extension Setup
+### 🧩 Extension Setup
 
 1. Open Google Chrome and navigate to `chrome://extensions/`.
 2. Enable **Developer mode** in the top right corner.
