@@ -27,9 +27,12 @@ export default function ResultCard({ result }) {
       </div>
 
       <div className="text-xl mb-4 font-bold border-4 border-current p-4 bg-[var(--card-bg)] text-[var(--text-main)] box-shadow-[4px_4px_0px_currentColor]">
-        CONFIDENCE SCORE: {result.confidence}%
+        <div className="flex flex-col md:flex-row justify-between mb-2">
+          <span>SAFE SCORE: {100 - result.threat_score}%</span>
+          <span>THREAT SCORE: {result.threat_score}%</span>
+        </div>
         <RiskMeter
-          confidence={result.confidence}
+          confidence={isSafe ? 100 - result.threat_score : result.threat_score}
           prediction={result.prediction}
         />
       </div>

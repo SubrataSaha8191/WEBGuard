@@ -96,7 +96,8 @@ model = PhishingBiLSTM().to(device)
 model.load_state_dict(
     torch.load(
         "models/deep_model.pth",
-        map_location=device
+        map_location=device,
+        weights_only=True
     )
 )
 
@@ -147,6 +148,9 @@ def predict_deep(url):
         if confidence >= 0.5
         else "safe"
     )
+
+    if prediction == "safe":
+        confidence = 1.0 - confidence
 
     confidence_percent = round(
         confidence * 100,
