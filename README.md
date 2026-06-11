@@ -1,5 +1,5 @@
 <div align="center">
-  <h1><img src="https://img.icons8.com/color/48/shield.png" width="40" height="40" align="absmiddle" /> WEBGuard (PhishGuard)</h1>
+  <h1><img src="https://img.icons8.com/color/48/shield.png" width="40" height="40" align="absmiddle" /> WEBGuard (WEBGuard)</h1>
   <p><em>An AI-Powered Phishing Detection Platform & Browser Extension</em></p>
   <p>
     <strong>Machine Learning</strong> • <strong>Computer Vision</strong> • <strong>Real-time Protection</strong>
@@ -166,7 +166,7 @@ npm run dev
 
 ## <img src="https://img.icons8.com/color/48/handshake.png" width="28" height="28" align="absmiddle" /> Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/SubrataSaha8191/PhishGuard/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/SubrataSaha8191/WEBGuard/issues).
 
 ---
 

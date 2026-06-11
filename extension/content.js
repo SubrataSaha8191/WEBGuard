@@ -1,9 +1,9 @@
-console.log("PhishGuard content script loaded");
+console.log("WEBGuard content script loaded");
 
 // REMOVE EXISTING OVERLAY
 
 function removeExistingWarning() {
-  const existing =document.getElementById("phishguard-warning-overlay");
+  const existing =document.getElementById("WEBGuard-warning-overlay");
 
   if (existing) {
     existing.remove();
@@ -13,7 +13,7 @@ function removeExistingWarning() {
 // REMOVE EXISTING TOAST
 
 function removeExistingToast() {
-  const existingToast = document.getElementById("phishguard-toast");
+  const existingToast = document.getElementById("WEBGuard-toast");
 
   if (existingToast) {
     existingToast.remove();
@@ -26,7 +26,7 @@ function showToast(data) {
   removeExistingToast();
 
   const toast = document.createElement("div");
-  toast.id = "phishguard-toast";
+  toast.id = "WEBGuard-toast";
 
   let bgColor = "#16a34a";
   let title = "SAFE";
@@ -81,7 +81,7 @@ function showToast(data) {
           font-size: 22px;
           font-weight: bold;
         ">
-          PhishGuard
+          WEBGuard
         </div>
 
       </div>
@@ -108,7 +108,7 @@ function createWarningOverlay(data) {
   removeExistingWarning();
   const overlay = document.createElement("div");
 
-  overlay.id ="phishguard-warning-overlay";
+  overlay.id ="WEBGuard-warning-overlay";
   overlay.innerHTML = `
     <div class="pg-warning-box">
 
@@ -150,7 +150,7 @@ function createWarningOverlay(data) {
   const style = document.createElement("style");
 
   style.textContent = `
-    #phishguard-warning-overlay {
+    #WEBGuard-warning-overlay {
       position: fixed;
       top: 0;
       left: 0;
