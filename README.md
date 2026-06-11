@@ -146,12 +146,15 @@ npm run dev
 ```
 </details>
 
-### 🧩 Extension Setup
+### 🧩 Extension Setup (Local Testing)
+
+> **Note:** By default, the extension is configured to communicate with the local backend API (`http://127.0.0.1:8000`). Please ensure your backend is running (via Docker or Manual Setup) before testing the extension.
 
 1. Open Google Chrome and navigate to `chrome://extensions/`.
 2. Enable **Developer mode** in the top right corner.
 3. Click **Load unpacked** and select the `extension` folder from this repository.
 4. Pin the **WEBGuard** extension to your toolbar.
+5. Navigate to any website to see the extension perform a real-time scan.
 
 ---
 
