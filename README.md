@@ -8,6 +8,14 @@
 
 ---
 
+## Live Demo
+
+🌐 Frontend: https://webguard-phis.vercel.app/
+
+⚡ Backend API: https://webguard-backend-h3n0.onrender.com
+
+📚 API Docs: https://webguard-backend-h3n0.onrender.com/docs
+
 ## <img src="https://img.icons8.com/color/48/open-book.png" width="28" height="28" align="absmiddle" /> Overview
 
 **WEBGuard** is a comprehensive phishing detection platform designed to protect users from malicious websites in real-time. By combining *Machine Learning* for URL feature analysis and *Deep Learning* (Computer Vision) for visual page inspection, WEBGuard provides robust, multi-layered security directly within your browser.
