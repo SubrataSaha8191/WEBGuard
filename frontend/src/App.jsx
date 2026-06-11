@@ -9,6 +9,12 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem("pg-theme") || "dark");
+  const [scanHistory, setScanHistory] = useState([]);
+  const [stats, setStats] = useState({
+    scansToday: 0,
+    threatsCaught: 0,
+    falsePositives: 0,
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -24,7 +30,16 @@ export default function App() {
       setLoading(true);
       setResult(null);
       const response = await API.post("/scan-url", { url });
-      setResult(response.data);
+      const scan = response.data;
+      setResult(scan);
+      setScanHistory((prev) => [scan, ...prev].slice(0, 5));
+      setStats((prev) => ({
+        scansToday: prev.scansToday + 1,
+        threatsCaught: prev.threatsCaught + (scan.prediction !== "safe" ? 1 : 0),
+        falsePositives:
+          prev.falsePositives +
+          (scan.prediction === "safe" && scan.ml_prediction === "phishing" ? 1 : 0),
+      }));
     } catch (err) {
       console.error(err);
       alert("Error scanning URL");
@@ -69,15 +84,15 @@ export default function App() {
             <div className="flex flex-col gap-4 font-bold text-sm">
               <div className="flex justify-between border-b-2 border-dotted border-current pb-2">
                 <span>SCANS TODAY:</span>
-                <span>1,337</span>
+                <span>{stats.scansToday}</span>
               </div>
               <div className="flex justify-between border-b-2 border-dotted border-current pb-2">
                 <span>THREATS CAUGHT:</span>
-                <span>42</span>
+                <span>{stats.threatsCaught}</span>
               </div>
               <div className="flex justify-between border-b-2 border-dotted border-current pb-2">
                 <span>FALSE POSITIVES:</span>
-                <span>1</span>
+                <span>{stats.falsePositives}</span>
               </div>
               <div className="flex justify-between pt-2">
                 <span>SYSTEM STATUS:</span>
@@ -123,59 +138,63 @@ export default function App() {
           <div className="retro-card p-6 flex-1">
             <h2 className="text-xl mb-4 border-b-4 border-[var(--border-color)] pb-2 uppercase">RECENT SCANS</h2>
             <ul className="flex flex-col gap-3 font-bold text-xs uppercase">
-              <li className="flex justify-between items-center">
-                <span className="truncate w-32" title="amazon-login-update.info">amazon-login...</span>
-                <span className="bg-danger text-[var(--danger-color)] px-2 py-1 border-2 border-current">THREAT</span>
-              </li>
-              <li className="flex justify-between items-center">
-                <span className="truncate w-32" title="github.com">github.com</span>
-                <span className="bg-safe text-[var(--safe-color)] px-2 py-1 border-2 border-current">SAFE</span>
-              </li>
-              <li className="flex justify-between items-center">
-                <span className="truncate w-32" title="netflix.com">netflix.com</span>
-                <span className="bg-safe text-[var(--safe-color)] px-2 py-1 border-2 border-current">SAFE</span>
-              </li>
-              <li className="flex justify-between items-center">
-                <span className="truncate w-32" title="secure-paypal-billing.net">secure-paypa...</span>
-                <span className="bg-danger text-[var(--danger-color)] px-2 py-1 border-2 border-current">THREAT</span>
-              </li>
-              <li className="flex justify-between items-center">
-                <span className="truncate w-32" title="apple.com">apple.com</span>
-                <span className="bg-safe text-[var(--safe-color)] px-2 py-1 border-2 border-current">SAFE</span>
-              </li>
+              {scanHistory.length > 0 ? (
+                scanHistory.map((scan) => (
+                  <li key={scan.url + scan.threat_score} className="flex justify-between items-center">
+                    <span className="truncate w-32" title={scan.url}>{scan.url}</span>
+                    <span className={`px-2 py-1 border-2 border-current ${scan.prediction === "safe" ? "bg-safe text-[var(--safe-color)]" : "bg-danger text-[var(--danger-color)]"}`}>
+                      {scan.prediction === "safe" ? "SAFE" : "THREAT"}
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-[var(--text-main)] opacity-70">No scans yet. Run one to populate history.</li>
+              )}
             </ul>
           </div>
 
           <div className="retro-card p-6 flex-1">
             <h2 className="text-xl mb-4 border-b-4 border-[var(--border-color)] pb-2 uppercase">THREAT TRENDS</h2>
             <div className="flex flex-col gap-4 text-xs font-bold">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span>SPEAR PHISHING</span>
-                  <span>45%</span>
-                </div>
-                <div className="w-full h-3 border-2 border-[var(--border-color)] bg-[var(--bg-color)]">
-                  <div className="h-full bg-danger w-[45%] border-r-2 border-[var(--border-color)]"></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span>MALWARE DROP</span>
-                  <span>30%</span>
-                </div>
-                <div className="w-full h-3 border-2 border-[var(--border-color)] bg-[var(--bg-color)]">
-                  <div className="h-full bg-warning w-[30%] border-r-2 border-[var(--border-color)]"></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span>CREDENTIAL THEFT</span>
-                  <span>25%</span>
-                </div>
-                <div className="w-full h-3 border-2 border-[var(--border-color)] bg-[var(--bg-color)]">
-                  <div className="h-full w-[25%] border-r-2 border-[var(--border-color)]" style={{ backgroundColor: "var(--primary)" }}></div>
-                </div>
-              </div>
+              {(() => {
+                const history = scanHistory.length > 0 ? scanHistory : result ? [result] : [];
+                const total = history.length || 1;
+                const spear = Math.round((history.filter((scan) => scan.prediction !== "safe").length / total) * 100);
+                const malware = Math.round((history.filter((scan) => scan.deep_prediction === "phishing").length / total) * 100);
+                const credential = Math.round((history.filter((scan) => (scan.features?.suspicious_word_count || 0) > 0).length / total) * 100);
+
+                return (
+                  <>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span>SPEAR PHISHING</span>
+                        <span>{spear}%</span>
+                      </div>
+                      <div className="w-full h-3 border-2 border-[var(--border-color)] bg-[var(--bg-color)]">
+                        <div className="h-full bg-danger" style={{ width: `${spear}%` }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span>MALWARE DROP</span>
+                        <span>{malware}%</span>
+                      </div>
+                      <div className="w-full h-3 border-2 border-[var(--border-color)] bg-[var(--bg-color)]">
+                        <div className="h-full bg-warning" style={{ width: `${malware}%` }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span>CREDENTIAL THEFT</span>
+                        <span>{credential}%</span>
+                      </div>
+                      <div className="w-full h-3 border-2 border-[var(--border-color)] bg-[var(--bg-color)]">
+                        <div className="h-full" style={{ width: `${credential}%`, backgroundColor: "var(--primary)" }}></div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
 

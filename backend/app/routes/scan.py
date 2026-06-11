@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.models.schemas import URLRequest
 import joblib
 import pandas as pd
+from urllib.parse import urlparse, urlunparse
 
 from app.utils.features import (
     extract_features
@@ -19,6 +20,23 @@ from app.ml.deep_predict import (
     predict_deep
 )
 
+# URL normalization
+
+def normalize_url(url):
+    url = url.strip()
+    if not url:
+        return url
+
+    parsed = urlparse(url, scheme="http")
+    if not parsed.netloc:
+        parsed = urlparse(f"http://{url}")
+
+    scheme = parsed.scheme or "http"
+    netloc = parsed.netloc
+    path = parsed.path if parsed.path else "/"
+
+    return urlunparse((scheme, netloc, path, "", "", ""))
+
 # ROUTER
 
 router = APIRouter()
@@ -33,7 +51,7 @@ model = joblib.load(
 
 @router.post("/scan-url")
 def scan_url(payload: URLRequest):
-    url = payload.url
+    url = normalize_url(payload.url)
 
     # FEATURE EXTRACTION
 
@@ -68,6 +86,16 @@ def scan_url(payload: URLRequest):
     deep_confidence = (
         deep_result["confidence"]
     )
+
+    # Override ML if deep model is safe and URL has no phishing signals
+    if (
+        deep_prediction == "safe" and
+        ml_prediction == "phishing" and
+        features.get("suspicious_word_count", 0) == 0 and
+        features.get("has_https", 0) == 1 and
+        features.get("has_ip", 0) == 0
+    ):
+        ml_prediction = "safe"
 
     # VIRUSTOTAL
 
@@ -137,6 +165,10 @@ def scan_url(payload: URLRequest):
         )
 
     final_confidence = round((ml_confidence * 0.8 + deep_confidence * 0.2) ,2)
+
+    # Override confidence with threat_score if threat_score is higher
+    # to reflect strict rules
+    final_confidence = float(max(final_confidence, threat_score))
 
     # RESPONSE
 

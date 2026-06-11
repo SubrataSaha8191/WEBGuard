@@ -3,7 +3,7 @@ import RiskMeter from "./RiskMeter";
 export default function ResultCard({ result }) {
   if (!result) return null;
 
-  const isSafe = result.prediction !== "phishing";
+  const isSafe = result.prediction === "safe";
 
   return (
     <div className={`p-6 border-4 border-[var(--border-color)] shadow-[6px_6px_0px_var(--border-color)] transition-all duration-300 ${

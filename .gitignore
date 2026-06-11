@@ -9,6 +9,7 @@ backend/venv/
 # Datasets
 datasets/
 backend/data/
+backend/debug_images/
 
 # OS / Editor
 .DS_Store

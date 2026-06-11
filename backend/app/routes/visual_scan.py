@@ -2,9 +2,9 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 import cv2
-import os
-import time
 import math
+import time
+from pathlib import Path
 
 from app.cv.capture_processor import (
     decode_base64_image
@@ -82,15 +82,11 @@ async def analyze_visual(
 
     timestamp = int(time.time())
 
-    os.makedirs(
-        "debug_images",
-        exist_ok=True
-    )
+    project_root = Path(__file__).resolve().parents[2]
+    debug_dir = project_root / "debug_images"
+    debug_dir.mkdir(parents=True, exist_ok=True)
 
-    debug_path = (
-        f"debug_images/"
-        f"scan_{timestamp}.png"
-    )
+    debug_path = debug_dir / f"scan_{timestamp}.png"
 
     # LABEL
 
@@ -134,7 +130,7 @@ async def analyze_visual(
     # SAVE DEBUG IMAGE
 
     cv2.imwrite(
-        debug_path,
+        str(debug_path),
         image
     )
 
@@ -161,5 +157,5 @@ async def analyze_visual(
             risk_score,
 
         "saved_image":
-            debug_path
+            str(debug_path.relative_to(project_root))
     }

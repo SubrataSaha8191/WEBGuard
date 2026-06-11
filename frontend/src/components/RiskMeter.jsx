@@ -1,5 +1,5 @@
 export default function RiskMeter({ confidence, prediction }) {
-  const isSafe = prediction !== "phishing";
+  const isSafe = prediction === "safe";
   
   return (
     <div className="mt-4">

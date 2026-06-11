@@ -1,6 +1,7 @@
 import socket
 import ssl
 import whois
+import tldextract
 from urllib.parse import urlparse
 from datetime import datetime
 
@@ -23,20 +24,62 @@ PHISHING_KEYWORDS = [
     "update",
     "account",
     "bank",
-    "paypal",
     "signin",
     "security",
     "confirm",
     "wallet",
     "crypto",
     "free",
-    "bonus"
+    "bonus",
+    "password"
+]
+
+BRAND_KEYWORDS = [
+    "paypal",
+    "amazon",
+    "apple",
+    "microsoft",
+    "google",
+    "netflix"
+]
+
+SAFE_TRAINING_DOMAINS = [
+    "google-gruyere.appspot.com",
+    "portswigger.net",
+    "portswigger-labs.net",
+    "owasp.org"
+]
+
+KNOWN_SAFE_DOMAINS = [
+    "google.com",
+    "github.com",
+    "stackoverflow.com",
+    "leetcode.com",
+    "zerodha.com"
 ]
 
 
 def get_domain(url):
     parsed = urlparse(url)
     return parsed.netloc.lower()
+
+
+def get_registered_domain(url):
+    extracted = tldextract.extract(url)
+
+    if extracted.suffix:
+        return f"{extracted.domain}.{extracted.suffix}".lower()
+
+    return extracted.domain.lower()
+
+
+def is_safe_training_page(url):
+    netloc = get_domain(url)
+    return netloc in SAFE_TRAINING_DOMAINS
+
+
+def is_known_safe_domain(url):
+    return get_registered_domain(url) in KNOWN_SAFE_DOMAINS
 
 
 def check_suspicious_tld(domain):
@@ -47,15 +90,20 @@ def check_suspicious_tld(domain):
 
 
 def keyword_score(url):
-    score = 0
-
     url_lower = url.lower()
+    registered_domain = get_registered_domain(url)
 
-    for word in PHISHING_KEYWORDS:
-        if word in url_lower:
-            score += 1
+    action_score = sum(
+        1 for word in PHISHING_KEYWORDS
+        if word in url_lower
+    )
 
-    return score
+    brand_score = sum(
+        1 for word in BRAND_KEYWORDS
+        if word in url_lower and word not in registered_domain
+    )
+
+    return action_score, brand_score
 
 
 def get_domain_age(domain):
@@ -95,7 +143,9 @@ def calculate_threat_score(
     ml_prediction,
     confidence
 ):
+    parsed = urlparse(url)
     domain = get_domain(url)
+    has_https = parsed.scheme.lower() == "https"
 
     score = 0
 
@@ -105,12 +155,34 @@ def calculate_threat_score(
 
     score += int(confidence * 0.3)
 
+    age = get_domain_age(domain)
+
+    # Known safe / training domains override
+    if is_known_safe_domain(url) or is_safe_training_page(url):
+        ssl_valid = has_valid_ssl(domain)
+
+        return {
+            "threat_score": 0,
+            "domain_age_days": age,
+            "ssl_valid": ssl_valid,
+            "suspicious_tld": False,
+            "keyword_score": 0,
+            "has_https": parsed.scheme.lower() == "https"
+        }
+
     # Suspicious TLD
-    if check_suspicious_tld(domain):
+    is_suspicious_tld = check_suspicious_tld(domain)
+    if is_suspicious_tld:
         score += 15
 
     # Phishing keywords
-    score += keyword_score(url) * 5
+    action_score, brand_score = keyword_score(url)
+    score += action_score * 15
+    score += brand_score * 5
+
+    # Strict rule: high keywords + suspicious TLD
+    if action_score >= 2 and is_suspicious_tld:
+        score += 40
 
     # Domain age
     age = get_domain_age(domain)
@@ -122,16 +194,25 @@ def calculate_threat_score(
         elif age < 180:
             score += 10
 
-    # SSL validation
+    # SSL / protocol scoring
     ssl_valid = has_valid_ssl(domain)
 
-    if not ssl_valid:
-        score += 20
+    total_keyword_score = action_score + brand_score
+
+    if not has_https:
+        if ssl_valid:
+            score += 5 if (total_keyword_score > 0 or is_suspicious_tld) else 2
+        else:
+            score += 20
+    else:
+        if total_keyword_score == 0 and not is_suspicious_tld:
+            score = max(score - 5, 0)
 
     return {
         "threat_score": min(score, 100),
         "domain_age_days": age,
         "ssl_valid": ssl_valid,
-        "suspicious_tld": check_suspicious_tld(domain),
-        "keyword_score": keyword_score(url)
+        "suspicious_tld": is_suspicious_tld,
+        "keyword_score": total_keyword_score,
+        "has_https": has_https,
     }
