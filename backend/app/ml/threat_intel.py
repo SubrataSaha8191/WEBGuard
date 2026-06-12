@@ -126,9 +126,11 @@ def get_domain_age(domain):
         return -1
 
 
+import certifi
+
 def has_valid_ssl(domain):
     try:
-        context = ssl.create_default_context()
+        context = ssl.create_default_context(cafile=certifi.where())
 
         with socket.create_connection((domain, 443), timeout=5) as sock:
             with context.wrap_socket(sock, server_hostname=domain):
@@ -205,8 +207,9 @@ def calculate_threat_score(
         else:
             score += 20
     else:
-        if total_keyword_score == 0 and not is_suspicious_tld:
-            score = max(score - 5, 0)
+        # If it claims HTTPS but SSL is invalid (e.g. ERR_CERT_AUTHORITY_INVALID)
+        if not ssl_valid:
+            score += 50
 
     return {
         "threat_score": min(score, 100),

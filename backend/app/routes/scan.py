@@ -92,7 +92,6 @@ def scan_url(payload: URLRequest):
         deep_prediction == "safe" and
         ml_prediction == "phishing" and
         features.get("suspicious_word_count", 0) == 0 and
-        features.get("has_https", 0) == 1 and
         features.get("has_ip", 0) == 0
     ):
         ml_prediction = "safe"

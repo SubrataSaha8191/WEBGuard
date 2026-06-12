@@ -48,7 +48,6 @@ def extract_features(url):
         "slash_count": url.count("/"),
         "question_mark_count": url.count("?"),
         "equal_count": url.count("="),
-        "has_https": 1 if parsed.scheme == "https" else 0,
         "has_ip": 1 if re.match(r"^\d+\.\d+\.\d+\.\d+", parsed.netloc) else 0,
         "digit_count": sum(char.isdigit() for char in url),
         "suspicious_word_count": sum(
